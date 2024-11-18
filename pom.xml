@@ -15,6 +15,7 @@
 
     <modules>
         <module>minion-service</module>
+        <module>master-service</module>
     </modules>
 
     <dependencyManagement>

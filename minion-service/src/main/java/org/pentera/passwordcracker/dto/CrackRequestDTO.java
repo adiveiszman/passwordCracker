@@ -6,9 +6,9 @@ public class CrackRequestDTO {
     private String startRange;
     private String endRange;
 
-    public void CrackRequestDTO() {}
+    public CrackRequestDTO() {}
 
-    public void CrackRequestDTO(String hash, String startRange, String endRange) {
+    public CrackRequestDTO(String hash, String startRange, String endRange) {
         this.hash = hash;
         this.startRange = startRange;
         this.endRange = endRange;
