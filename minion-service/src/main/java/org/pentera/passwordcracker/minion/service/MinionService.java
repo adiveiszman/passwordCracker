@@ -1,45 +1,37 @@
 package org.pentera.passwordcracker.minion.service;
 
-import org.pentera.passwordcracker.dto.TaskResultDTO;
+import org.pentera.passwordcracker.dto.CrackResultDTO;
 import org.pentera.passwordcracker.minion.utils.Utils;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 @Service
 public class MinionService {
-    private final WebClient webClient;
     private final static String ALGORITHM = "MD5";
 
-    public MinionService() {
-        this.webClient = WebClient.builder().build();
-    }
+    public MinionService() {}
 
-    public TaskResultDTO processRange(String hash, String startRange, String endRange) {
-        TaskResultDTO result = new TaskResultDTO();
-        long start = Utils.passwordToLong(startRange);
-        long end = Utils.passwordToLong(endRange);
+    public CrackResultDTO processTask(String hash, long startRange, long endRange) {
+        CrackResultDTO result = new CrackResultDTO();
 
         result.setHash(hash);
         try {
-            String crackedPassword = crackPassword(hash, start, end);
+            String crackedPassword = crackPassword(hash, startRange, endRange);
             if (crackedPassword != null) {
                 result.setCrackedPassword(crackedPassword);
-                result.setStatus(TaskResultDTO.Status.CRACKED);
-                System.out.println("Cracked: " + hash + " = " + crackedPassword);
-
+                result.setStatus(CrackResultDTO.Status.CRACKED);
+                System.out.println("Cracked: " + hash + " = " + crackedPassword + " in range: " + startRange + " - " + endRange);
             } else {
-                result.setStatus(TaskResultDTO.Status.NOT_FOUND);
+                result.setStatus(CrackResultDTO.Status.NOT_IN_RANGE);
                 System.out.println("Could not crack hash: " + hash + " in range: " + startRange + " to " + endRange);
             }
         } catch (Exception e) {
-            result.setStatus(TaskResultDTO.Status.FAILED);
-            System.out.println("Failed to crack: " + e);
+            result.setStatus(CrackResultDTO.Status.FAILED);
+            System.out.println("Failed to crack with error: " + e);
         }
 
-        notifyMaster(result);
         return result;
     }
 
@@ -59,24 +51,4 @@ public class MinionService {
 
         return null;
     }
-
-    public void notifyMaster(TaskResultDTO taskResult) {
-        this.webClient
-                .post()
-                .uri("http://localhost:8080/master/task/completion")
-                .bodyValue(taskResult)
-                .retrieve()
-                .toBodilessEntity()
-                .subscribe();
-    }
-
-//    private void handleSuccess(ResponseEntity<Void> response, CrackRequestDTO request) {
-//        //TODO: Add the minion to the list of active minions
-//        System.out.println(response + "\nSuccessfully assigned Task for Hash: " + request.getHash() + " | Range: " + request.getStartRange() + " - " + request.getEndRange());
-//    }
-//
-//    private void handleError(Throwable error, CrackRequestDTO request) {
-//        System.out.println("Failed to assign Task for Hash: " + request.getHash() + " | Range: " + request.getStartRange() + " - " + request.getEndRange());
-//        //TODO: Reduce the mionionCount and handle redistribution for this range
-//    }
 }

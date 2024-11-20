@@ -1,21 +1,21 @@
 package org.pentera.passwordcracker.dto;
 
-public class TaskResultDTO {
+public class CrackResultDTO {
     private String hash;
     private String crackedPassword;
     private Status status;
 
     public enum Status {
-        CRACKED, NOT_FOUND, FAILED
+        CRACKED, NOT_IN_RANGE, FAILED
     }
 
-    public TaskResultDTO() {
+    public CrackResultDTO() {
         this.hash = null;
         this.crackedPassword = null;
         this.status = null;
     }
 
-    public TaskResultDTO(String hash, String crackedPassword, Status status) {
+    public CrackResultDTO(String hash, String crackedPassword, Status status) {
         this.hash = hash;
         this.crackedPassword = crackedPassword;
         this.status = status;

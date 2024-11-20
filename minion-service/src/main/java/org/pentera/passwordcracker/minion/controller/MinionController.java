@@ -1,9 +1,8 @@
 package org.pentera.passwordcracker.minion.controller;
 
 import org.pentera.passwordcracker.dto.CrackRequestDTO;
-import org.pentera.passwordcracker.dto.TaskResultDTO;
+import org.pentera.passwordcracker.dto.CrackResultDTO;
 import org.pentera.passwordcracker.minion.service.MinionService;
-import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,15 +16,14 @@ public class MinionController {
     }
 
     @PostMapping("/crack")
-    public ResponseEntity<String> crackHash(@RequestBody CrackRequestDTO request) {
-        //NOTE: Controller is tightly coupled with the DTO,
-        // which enhances the maintainability of the code and makes it easier to handle changes in the data structure
-        // without impacting the service logic directly
-        TaskResultDTO result = crackPasswordService.processRange(request.getHash(), request.getStartRange(), request.getEndRange());
-        String password = result.getCrackedPassword();
-        if (password != null) {
-            return ResponseEntity.ok(password);
+    public ResponseEntity<CrackResultDTO> crackHash(@RequestBody CrackRequestDTO request) {
+        CrackResultDTO result = crackPasswordService.processTask(request.getHash(), request.getStartRange(),
+                request.getEndRange());
+        if(result.getStatus() == CrackResultDTO.Status.CRACKED
+                || result.getStatus() == CrackResultDTO.Status.NOT_IN_RANGE) {
+            return ResponseEntity.ok(result);
+        } else {
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.notFound().build();
     }
 }

@@ -4,9 +4,8 @@ import java.math.BigInteger;
 
 public class Utils {
     public static String formatPassword(long number) {
-        String numberStr = '0' + String.valueOf(number);
-
-        return numberStr.substring(0, 3) + "-" + numberStr.substring(3);
+        String numberStr = String.format("%08d", number);
+        return String.format("05%s-%s", numberStr.charAt(0), numberStr.substring(1));
     }
 
     public static long passwordToLong(String password) {

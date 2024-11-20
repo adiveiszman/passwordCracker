@@ -2,7 +2,7 @@ package org.pentera.passwordcracker.minion.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.pentera.passwordcracker.dto.TaskResultDTO;
+import org.pentera.passwordcracker.dto.CrackResultDTO;
 import org.pentera.passwordcracker.minion.service.MinionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -30,9 +30,9 @@ public class MinionControllerTest {
     @Test
     public void testCrackEndpoint() throws Exception {
         String hash = "hash";
-        String start = "050-0000000";
-        String end = "050-0000000";
-        TaskResultDTO result = new TaskResultDTO(hash, "050-0000000", TaskResultDTO.Status.CRACKED);
+        long start = 0;
+        long end = 0;
+        CrackResultDTO result = new CrackResultDTO(hash, "050-0000000", CrackResultDTO.Status.CRACKED);
 
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Object> payload = new HashMap<>();
@@ -42,7 +42,7 @@ public class MinionControllerTest {
 
         String jsonContent = objectMapper.writeValueAsString(payload);
 
-        when(crackPasswordService.processRange(hash, start, end)).thenReturn(result);
+        when(crackPasswordService.processTask(hash, start, end)).thenReturn(result);
 
         mockMvc.perform(post("/minion/crack")
                         .contentType(MediaType.APPLICATION_JSON)
