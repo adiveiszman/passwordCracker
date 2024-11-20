@@ -1,7 +1,7 @@
 package com.pentera.passwordcracker.master.controller;
 
 import com.pentera.passwordcracker.master.service.HashReaderService;
-import com.pentera.passwordcracker.master.service.MasterService;
+import com.pentera.passwordcracker.master.service.PasswordCrackMasterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,11 +13,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/master")
 public class MasterController {
-    private final MasterService masterService;
+    private final PasswordCrackMasterService masterService;
     private final HashReaderService hashReaderService;
 
     @Autowired
-    public MasterController(MasterService masterService, HashReaderService hashReaderService) {
+    public MasterController(PasswordCrackMasterService masterService, HashReaderService hashReaderService) {
         this.masterService = masterService;
         this.hashReaderService = hashReaderService;
     }

@@ -3,7 +3,7 @@ package org.pentera.passwordcracker.minion.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.pentera.passwordcracker.dto.CrackResultDTO;
-import org.pentera.passwordcracker.minion.service.MinionService;
+import org.pentera.passwordcracker.minion.service.PasswordCrackMinionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -25,7 +25,7 @@ public class MinionControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private MinionService crackPasswordService;
+    private PasswordCrackMinionService crackPasswordService;
 
     @Test
     public void testCrackEndpoint() throws Exception {

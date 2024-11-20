@@ -1,4 +1,4 @@
-package com.pentera.passwordcracker.master.dto;
+package com.pentera.passwordcracker.dto;
 
 public class Range {
     private final long start;

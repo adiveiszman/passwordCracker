@@ -20,16 +20,10 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-
-        <!--allows your Spring Boot application to handle asynchronous and event-driven scenarios more efficiently,
-            making it ideal for applications that interact heavily with I/O operations.-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
-
-        <!--essential for monitoring and managing your application in production, providing vital operational
-            capabilities with minimal configuration.-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>

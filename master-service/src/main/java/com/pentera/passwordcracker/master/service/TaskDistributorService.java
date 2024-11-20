@@ -1,6 +1,6 @@
 package com.pentera.passwordcracker.master.service;
 
-import com.pentera.passwordcracker.master.dto.Range;
+import com.pentera.passwordcracker.dto.Range;
 import com.pentera.passwordcracker.master.utils.Utils;
 import org.pentera.passwordcracker.dto.CrackRequestDTO;
 import org.pentera.passwordcracker.dto.CrackResultDTO;
@@ -18,7 +18,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Service
 public class TaskDistributorService {
     @Autowired
-    private MasterService masterService;
+    private PasswordCrackMasterService masterService;
 
     private final WebClient webClient;
     private final List<String> minionsEndpoints;

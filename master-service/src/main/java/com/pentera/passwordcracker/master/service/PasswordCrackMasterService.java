@@ -1,7 +1,6 @@
 package com.pentera.passwordcracker.master.service;
 
-import com.pentera.passwordcracker.master.dto.Range;
-import com.pentera.passwordcracker.master.utils.Utils;
+import com.pentera.passwordcracker.dto.Range;
 import org.pentera.passwordcracker.dto.CrackRequestDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class MasterService {
+public class PasswordCrackMasterService {
     private static final long TOTAL_PHONE_NUMBERS = 100_000_000;
     private final List<String> pendingHashes = new ArrayList<>();
 

@@ -7,10 +7,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.pentera.passwordcracker.dto.CrackResultDTO;
 
-public class CrackPasswordServiceTest {
+public class PasswordCrackMinionServiceTest {
     @Test
     public void testCrackPasswordFindsMatch() {
-        MinionService service = new MinionService();
+        PasswordCrackMinionService service = new PasswordCrackMinionService();
         String expectedPassword = "050-6880727";
         String hash = "93767ae313002380f8068a18aaa10d51";
         long start = 6880720;
@@ -24,7 +24,7 @@ public class CrackPasswordServiceTest {
 
     @Test
     public void testCrackPasswordNoMatch() {
-        MinionService service = new MinionService();
+        PasswordCrackMinionService service = new PasswordCrackMinionService();
         String hash = "somehash";
         long start = 26880720;
         long end = 26880729;
@@ -37,7 +37,7 @@ public class CrackPasswordServiceTest {
 
     @Test
     public void testCrackPasswordFailed() {
-        MinionService service = Mockito.mock(MinionService.class);
+        PasswordCrackMinionService service = Mockito.mock(PasswordCrackMinionService.class);
 
         String hash = "93767ae313002380f8068a18aaa10d51";
         long start = 26880720;

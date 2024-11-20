@@ -8,10 +8,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 @Service
-public class MinionService {
+public class PasswordCrackMinionService {
     private final static String ALGORITHM = "MD5";
 
-    public MinionService() {}
+    public PasswordCrackMinionService() {}
 
     public CrackResultDTO processTask(String hash, long startRange, long endRange) {
         CrackResultDTO result = new CrackResultDTO();
