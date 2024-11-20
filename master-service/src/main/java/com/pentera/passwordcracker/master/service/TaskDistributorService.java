@@ -48,7 +48,9 @@ public class TaskDistributorService {
         for (String failedMinion : allMinionRanges.keySet()) {
             if (!currentMinions.contains(failedMinion)) {
                 Range failedRange = passwordCrackMasterService.removeRangeForMinion(failedMinion);
-                redistributeRangeToActiveMinions(failedRange, currentMinions);
+                if(failedRange != null) {
+                    redistributeRangeToActiveMinions(failedRange, currentMinions);
+                }
             }
         }
     }
