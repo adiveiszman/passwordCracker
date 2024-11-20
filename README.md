@@ -75,19 +75,19 @@ To start the password-cracking process, use a REST client like Postman to send a
 
 To initiate the password-cracking process on a minion server, use the following endpoint (this should be used only for directly contacting a minion server, not for managing the entire cracking process):
 
-- **Endpoint**: POST [http://localhost:8081/minions/crack](http://localhost:8081/minions/crack)
+- **Endpoint**: POST [http://localhost:8081/minion/crack](http://localhost:8081/minions/crack)
 - **Body**: Provide the hash and the range of potential passwords to be checked.
 
   Example input:
   ```json
   {
       "hash": "be3ddca3d0b06596aea3ebd4f5e6ffc2",
-      "startRange": 26880726,
+      "startRange": 10000000,
       "endRange": 26880728
   }
   ```
   
-  This input will check the phone numbers range from `052-6880726` to `052-6880728`.
+  This input will check the phone numbers range from `051-0000000` to `052-6880728`.
 
 The master server will distribute the workload to the minion servers to crack the passwords concurrently.
 
