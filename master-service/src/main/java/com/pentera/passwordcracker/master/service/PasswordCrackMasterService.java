@@ -1,86 +1,86 @@
 package com.pentera.passwordcracker.master.service;
 
 import com.pentera.passwordcracker.dto.Range;
+import com.pentera.passwordcracker.master.utils.Utils;
 import org.pentera.passwordcracker.dto.CrackRequestDTO;
+import org.pentera.passwordcracker.dto.CrackResultDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Service
 public class PasswordCrackMasterService {
-    private static final long TOTAL_PHONE_NUMBERS = 100_000_000;
-    private final List<String> pendingHashes = new ArrayList<>();
-
     @Autowired
-    TaskDistributorService taskDistributorService;
+    private TaskDistributorService taskDistributorService;
 
-    public void distributeInitialTasks(List<String> hashes) {
-        List<String> currentMinions = taskDistributorService.getMinionsEndpoints();
-        int minionsCount = currentMinions.size();
-        long rangeSize = TOTAL_PHONE_NUMBERS / minionsCount;
+    private final WebClient webClient;
+    private final List<String> minionsEndpoints;
+    private final Map<String, Range> minionRanges;
 
-        for (int i = 0; i < minionsCount; i++) {
-            long startRange = i * rangeSize;
-            long endRange = (i == minionsCount - 1) ? TOTAL_PHONE_NUMBERS - 1 : (i + 1) * rangeSize - 1;
-            String minion = currentMinions.get(i);
+    public PasswordCrackMasterService() {
+        this.webClient = WebClient.builder().build();
+        this.minionsEndpoints = new CopyOnWriteArrayList<>(Utils.getMinionsEndpointsFromProps());
+        this.minionRanges = new ConcurrentHashMap<>();
+    }
 
-            taskDistributorService.assignRangeToMinion(minion, startRange, endRange);
+    public List<String> getMinionsEndpoints() {
+        return this.minionsEndpoints;
+    }
 
-            for (String hash : hashes) {
-                CrackRequestDTO request = new CrackRequestDTO(hash, startRange, endRange);
-                taskDistributorService.sendTaskToMinion(request, minion);
-            }
+    @Async
+    public void sendTaskToMinion(CrackRequestDTO request, String minionEndpoint) {
+        this.webClient.post()
+                .uri(minionEndpoint + "/minion/crack")
+                .bodyValue(request)
+                .retrieve()
+                .toEntity(CrackResultDTO.class)
+                .subscribe(response -> {
+                    if (response.getStatusCode().is2xxSuccessful()) {
+                        handleCompletion(Objects.requireNonNull(response.getBody()));
+                    } else {
+                        handleMinionFailure(request, minionEndpoint);
+                    }
+                }, error -> handleMinionFailure(request, minionEndpoint));
+    }
+
+    private void handleCompletion(CrackResultDTO result) {
+        if (result.getStatus() == CrackResultDTO.Status.CRACKED) {
+            System.out.println(result.getHash() + " = " + result.getCrackedPassword());
         }
     }
 
-    public void redistributeTasks() {
-        List<String> currentMinions = taskDistributorService.getMinionsEndpoints();
+    private void handleMinionFailure(CrackRequestDTO request, String minionEndpoint) {
+        removeMinionFromEndpoints(minionEndpoint);
+        taskDistributorService.addPendingHash(request.getHash());
+        taskDistributorService.redistributeTasks();
+    }
 
-        if (currentMinions.isEmpty()) {
-            System.err.println("No active minions to redistribute tasks.");
-            return;
-        }
-
-        Map<String, Range> allMinionRanges = taskDistributorService.getAllMinionRanges();
-        for (String failedMinion : allMinionRanges.keySet()) {
-            if (!currentMinions.contains(failedMinion)) {
-                Range failedRange = taskDistributorService.removeRangeForMinion(failedMinion);
-                redistributeRangeToActiveMinions(failedRange, currentMinions);
-            }
+    public void removeMinionFromEndpoints(String minionEndpoint) {
+        synchronized (this.minionsEndpoints) {
+            this.minionsEndpoints.remove(minionEndpoint);
         }
     }
 
-    private void redistributeRangeToActiveMinions(Range failedRange, List<String> activeMinions) {
-        long subRangeSize = (failedRange.getEnd() - failedRange.getStart() + 1) / activeMinions.size();
-
-        for (int i = 0; i < activeMinions.size(); i++) {
-            long subStart = failedRange.getStart() + i * subRangeSize;
-            long subEnd = (i == activeMinions.size() - 1) ? failedRange.getEnd()
-                    : subStart + subRangeSize - 1;
-
-            String minion = activeMinions.get(i);
-            taskDistributorService.assignRangeToMinion(minion, subStart, subEnd);
-
-            for (String hash : getCurrentHashes()) {
-                CrackRequestDTO request = new CrackRequestDTO(hash, subStart, subEnd);
-                taskDistributorService.sendTaskToMinion(request, minion);
-            }
-        }
+    public void assignRangeToMinion(String minionEndpoint, long startRange, long endRange) {
+        minionRanges.put(minionEndpoint, new Range(startRange, endRange));
     }
 
-    public void addPendingHash(String hash) {
-        synchronized (pendingHashes) {
-            pendingHashes.add(hash);
-        }
+    public Range getRangeForMinion(String minionEndpoint) {
+        return minionRanges.get(minionEndpoint);
     }
 
-    public List<String> getCurrentHashes() {
-        synchronized (pendingHashes) {
-            return new ArrayList<>(pendingHashes); // Return a copy to avoid modification
-        }
+    public Range removeRangeForMinion(String minionEndpoint) {
+        return minionRanges.remove(minionEndpoint);
+    }
+
+    public Map<String, Range> getAllMinionRanges() {
+        return new ConcurrentHashMap<>(minionRanges);
     }
 }
-
