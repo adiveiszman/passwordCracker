@@ -100,3 +100,27 @@ The master server will distribute the workload to the minion servers to crack th
 
 - Ensure all minion endpoints are correctly set in the master configuration.
 - Make sure the minion servers are running and reachable from the master server.
+
+## Future Improvements
+
+### Optimize Hash Cracking Coordination
+
+- Implement a notification mechanism for minions to broadcast when a password has been cracked successfully.
+- Ensure that all active minions receive this notification and stop processing the corresponding hash to conserve resources and avoid redundant work.
+
+### Enhance Task Redistribution Logic
+
+- Currently, when a minion fails, its tasks are redistributed to other active minions. However, it is possible that another minion has already cracked the hash within its assigned range.
+- Introduce a verification mechanism to check if the hash has already been cracked before redistributing tasks.
+
+### Dynamic Minion Management
+
+- Support runtime updates to the `minion.endpoints` property in the `application.properties` file to allow dynamic addition or removal of minions without restarting the application.
+- This feature would improve scalability and fault tolerance.
+
+### Improve Test Coverage
+
+- Add tests for master-service and add more tests to minions-service.
+
+
+  
