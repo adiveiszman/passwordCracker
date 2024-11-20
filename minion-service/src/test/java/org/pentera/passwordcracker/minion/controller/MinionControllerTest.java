@@ -41,6 +41,7 @@ public class MinionControllerTest {
         payload.put("endRange", end);
 
         String jsonContent = objectMapper.writeValueAsString(payload);
+        String expectedResponse = objectMapper.writeValueAsString(result); // Serialize expected result to JSON
 
         when(crackPasswordService.processTask(hash, start, end)).thenReturn(result);
 
@@ -49,6 +50,6 @@ public class MinionControllerTest {
                         .content(jsonContent)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().string(result.getCrackedPassword()));
+                .andExpect(content().json(expectedResponse)); // Use content().json() for JSON comparison
     }
 }

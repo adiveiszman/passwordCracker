@@ -9,15 +9,6 @@ import java.util.List;
 import java.util.Properties;
 
 public class Utils {
-    public static String formatPassword(long number) {
-        String numberStr = String.format("%08d", number);
-        return String.format("05%s-%s", numberStr.charAt(0), numberStr.substring(1));
-    }
-
-    public static long passwordToLong(String password) {
-        return Long.parseLong(password.replace("-", ""));
-    }
-
     public static List<String> getMinionsEndpointsFromProps() {
         Properties props = new Properties();
 

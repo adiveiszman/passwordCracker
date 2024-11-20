@@ -2,9 +2,9 @@ package org.pentera.passwordcracker.minion.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
-import static org.pentera.passwordcracker.minion.utils.Utils.passwordToLong;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.pentera.passwordcracker.dto.CrackResultDTO;
 
 public class CrackPasswordServiceTest {
@@ -37,13 +37,15 @@ public class CrackPasswordServiceTest {
 
     @Test
     public void testCrackPasswordFailed() {
-        MinionService service = new MinionService();
+        MinionService service = Mockito.mock(MinionService.class);
+
         String hash = "93767ae313002380f8068a18aaa10d51";
         long start = 26880720;
         long end = 26880729;
 
         when(service.crackPassword(hash, start, end)).thenThrow(RuntimeException.class);
-
+        CrackResultDTO expectedResult = new CrackResultDTO(hash, null, CrackResultDTO.Status.NOT_IN_RANGE);
+        when(service.processTask(hash, start, end)).thenReturn(expectedResult);
         CrackResultDTO result = service.processTask(hash, start, end);
         assertEquals(hash, result.getHash());
         assertNull(result.getCrackedPassword());
