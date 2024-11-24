@@ -12,8 +12,8 @@ public class Utils {
     public static List<String> getMinionsEndpointsFromProps() {
         Properties props = new Properties();
 
-        try (InputStream input = Files.newInputStream(Paths
-                .get("master-service/src/main/resources/application.properties"))) {
+        try (InputStream input = Utils.class.getClassLoader()
+                .getResourceAsStream("application.properties")) {
             props.load(input);
             String endpoints = props.getProperty("minion.endpoints");
             return Arrays.asList(endpoints.split("\\s*,\\s*"));
